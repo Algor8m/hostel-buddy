@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/mint_background" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="18dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cravingsAdminBack"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="← Back"
+                android:textAllCaps="false"
+                android:textColor="@color/nmims_maroon"
+                android:backgroundTint="@color/pale_rose"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/cravingsAdminLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Logout"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/primary_burgundy"
+                android:textStyle="bold"
+                android:drawableStart="@drawable/ic_logout_white"
+                android:drawablePadding="6dp"
+                android:paddingHorizontal="14dp"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="CAMPUS CRAVINGS" android:textStyle="bold" android:textSize="25sp"
+            android:textColor="@color/nmims_maroon" android:layout_marginTop="10dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Manage food truck items, prices, categories and availability. Students can view items but cannot order."
+            android:textColor="@color/slate" android:textSize="14sp" android:layout_marginTop="6dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp" android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="ADD / EDIT ITEM" android:textColor="@color/nmims_maroon"
+                android:textStyle="bold" android:textSize="17sp"/>
+            <EditText android:id="@+id/itemNumberInput" android:layout_width="match_parent"
+                android:layout_height="50dp" android:hint="Item number (optional)" android:inputType="text"
+                android:singleLine="true" android:padding="12dp" android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <EditText android:id="@+id/itemNameInput" android:layout_width="match_parent"
+                android:layout_height="50dp" android:hint="Item name" android:inputType="textCapWords"
+                android:singleLine="true" android:padding="12dp" android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <EditText android:id="@+id/itemPriceInput" android:layout_width="match_parent"
+                android:layout_height="50dp" android:hint="Price in ₹" android:inputType="numberDecimal"
+                android:singleLine="true" android:padding="12dp" android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Category" android:textColor="@color/slate" android:textStyle="bold" android:layout_marginTop="8dp"/>
+            <Spinner android:id="@+id/itemCategorySpinner" android:layout_width="match_parent"
+                android:layout_height="52dp" android:spinnerMode="dropdown"
+                android:clickable="true" android:focusable="true"
+                android:backgroundTint="@color/nmims_maroon"
+                android:dropDownWidth="match_parent" android:popupBackground="@android:color/white"/>
+            <CheckBox android:id="@+id/itemAvailableCheck" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Available to purchase at the truck"
+                android:textColor="@color/slate" android:layout_marginTop="4dp"/>
+            <Button android:id="@+id/saveCravingsItemButton" android:layout_width="match_parent"
+                android:layout_height="52dp" android:text="SAVE ITEM"
+                android:textColor="@android:color/white" android:backgroundTint="@color/nmims_maroon"
+                android:textStyle="bold" android:layout_marginTop="8dp"/>
+            <Button android:id="@+id/clearCravingsFormButton" android:layout_width="match_parent"
+                android:layout_height="48dp" android:text="CLEAR FORM"
+                android:textColor="@color/navy" android:backgroundTint="#B9DDFB" android:layout_marginTop="6dp"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="CURRENT MENU ITEMS" android:textStyle="bold" android:textSize="18sp"
+            android:textColor="@color/nmims_maroon" android:layout_marginTop="20dp" android:layout_marginBottom="8dp"/>
+        <LinearLayout android:id="@+id/cravingsItemsContainer" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"/>
+        <TextView android:id="@+id/cravingsAdminStatus" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Ready." android:textColor="@color/slate"
+            android:padding="12dp" android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</ScrollView>

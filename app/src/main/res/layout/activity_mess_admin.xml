@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/mint_background" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="18dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/messAdminBack"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="← Back"
+                android:textAllCaps="false"
+                android:textColor="@color/nmims_maroon"
+                android:backgroundTint="@color/pale_rose"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/messAdminLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:text="Logout"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/primary_burgundy"
+                android:textStyle="bold"
+                android:drawableStart="@drawable/ic_logout_white"
+                android:drawablePadding="6dp"
+                android:paddingHorizontal="14dp"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="MESS MENU MANAGEMENT" android:textStyle="bold" android:textSize="23sp"
+            android:textColor="@color/nmims_maroon" android:layout_marginTop="10dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Upload the two-week menu or edit a selected meal. Changes are saved to Firebase."
+            android:textColor="@color/slate" android:textSize="14sp" android:layout_marginTop="6dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp" android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="1. IMPORT MENU CSV" android:textColor="@color/nmims_maroon"
+                android:textStyle="bold" android:textSize="17sp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Required headers: week, day. Optional columns: breakfast, lunch, snacks, dinner, venue, specialDinner. Week values: 1 or 2. One row per day."
+                android:textColor="@color/slate" android:textSize="13sp" android:layout_marginTop="6dp"/>
+            <Button android:id="@+id/importCsvButton" android:layout_width="match_parent"
+                android:layout_height="54dp" android:text="CHOOSE CSV FILE"
+                android:textColor="@color/navy" android:backgroundTint="#B9DDFB"
+                android:textStyle="bold" android:layout_marginTop="10dp"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp" android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="2. EDIT A MEAL" android:textColor="@color/nmims_maroon"
+                android:textStyle="bold" android:textSize="17sp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Week" android:textStyle="bold" android:textColor="@color/slate" android:layout_marginTop="12dp"/>
+            <Spinner android:id="@+id/weekSpinner" android:layout_width="match_parent" android:layout_height="48dp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Day" android:textStyle="bold" android:textColor="@color/slate" android:layout_marginTop="8dp"/>
+            <Spinner android:id="@+id/daySpinner" android:layout_width="match_parent" android:layout_height="48dp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Meal" android:textStyle="bold" android:textColor="@color/slate" android:layout_marginTop="8dp"/>
+            <Spinner android:id="@+id/mealSpinner" android:layout_width="match_parent" android:layout_height="48dp"/>
+            <Button android:id="@+id/loadMealButton" android:layout_width="match_parent"
+                android:layout_height="48dp" android:text="LOAD SELECTED MEAL"
+                android:textColor="@color/nmims_maroon" android:backgroundTint="@color/pale_rose"
+                android:layout_marginTop="6dp"/>
+            <EditText android:id="@+id/mealItemsInput" android:layout_width="match_parent"
+                android:layout_height="110dp" android:gravity="top|start" android:inputType="textCapSentences|textMultiLine"
+                android:hint="Enter meal items, separated by commas" android:padding="12dp"
+                android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <Button android:id="@+id/saveMealButton" android:layout_width="match_parent"
+                android:layout_height="52dp" android:text="SAVE MEAL CHANGES"
+                android:textColor="@android:color/white" android:backgroundTint="@color/nmims_maroon"
+                android:textStyle="bold" android:layout_marginTop="8dp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Meal venue (optional)" android:textStyle="bold" android:textColor="@color/slate" android:layout_marginTop="12dp"/>
+            <EditText android:id="@+id/venueInput" android:layout_width="match_parent"
+                android:layout_height="50dp" android:hint="e.g. Main Mess" android:singleLine="true"
+                android:padding="12dp" android:background="@drawable/bg_input"/>
+            <Button android:id="@+id/saveVenueButton" android:layout_width="match_parent"
+                android:layout_height="48dp" android:text="SAVE VENUE"
+                android:textColor="@color/navy" android:backgroundTint="#B9DDFB" android:layout_marginTop="6dp"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp" android:layout_marginTop="14dp"
+            android:background="@drawable/bg_card">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="3. SPECIAL DINNER (SELECTED DAY ONLY)" android:textColor="@color/nmims_maroon"
+                android:textStyle="bold" android:textSize="17sp"/>
+            <EditText android:id="@+id/specialDinnerInput" android:layout_width="match_parent"
+                android:layout_height="100dp" android:gravity="top|start" android:inputType="textMultiLine|textCapSentences"
+                android:hint="Enter special dinner menu items" android:padding="12dp"
+                android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <EditText android:id="@+id/specialVenueInput" android:layout_width="match_parent"
+                android:layout_height="50dp" android:hint="Special dinner venue (optional)" android:singleLine="true"
+                android:padding="12dp" android:background="@drawable/bg_input" android:layout_marginTop="8dp"/>
+            <Button android:id="@+id/markSpecialDinnerButton" android:layout_width="match_parent"
+                android:layout_height="54dp" android:text="MARK AS SPECIAL DINNER"
+                android:textColor="@android:color/white" android:backgroundTint="@color/nmims_maroon"
+                android:textStyle="bold" android:layout_marginTop="10dp"/>
+        </LinearLayout>
+        <TextView android:id="@+id/messAdminStatus" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Ready." android:textColor="@color/slate"
+            android:padding="12dp" android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>

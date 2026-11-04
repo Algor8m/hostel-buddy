@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Identity (NMIMS / Hostel Buddy) -->
+    <color name="primary_burgundy">#7A0019</color>
+    <color name="deep_burgundy">#590015</color>
+    <color name="burgundy_tint">#1A7A0019</color>
+    <color name="burgundy_light">#FBE9ED</color>
+
+    <!-- Surfaces & Neutrals -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="background_light">#F7F7F9</color>
+    <color name="card_surface">#FFFFFF</color>
+    <color name="card_border">#E8E8ED</color>
+    <color name="divider">#ECECEF</color>
+
+    <!-- Typography -->
+    <color name="text_primary">#252525</color>
+    <color name="text_secondary">#707070</color>
+    <color name="text_muted">#9E9EA7</color>
+
+    <!-- Functional Accents (from UI Inspiration) -->
+    <color name="status_live_green">#27AE60</color>
+    <color name="card_serving_bg">#EBF8F2</color>
+    <color name="card_serving_border">#C6EEDC</color>
+    <color name="serving_text">#0E6251</color>
+
+    <color name="banner_reminder_bg">#FFF8E7</color>
+    <color name="banner_reminder_border">#FEE8B6</color>
+    <color name="reminder_accent">#E67E22</color>
+
+    <color name="action_tile_blue_bg">#EDF5FD</color>
+    <color name="action_tile_blue_border">#D3E5FA</color>
+    <color name="action_tile_blue_icon">#2980B9</color>
+
+    <color name="tag_veg_bg">#E8F5E9</color>
+    <color name="tag_veg_text">#2E7D32</color>
+    <color name="tag_nonveg_bg">#FFEBEE</color>
+    <color name="tag_nonveg_text">#C62828</color>
+
+    <!-- Backward compatibility aliases -->
+    <color name="black">#FF000000</color>
+    <color name="nmims_maroon">#7A0019</color>
+    <color name="nmims_wine">#590015</color>
+    <color name="mint_background">#F7F7F9</color>
+    <color name="pale_rose">#FBE9ED</color>
+    <color name="pale_mint">#EBF8F2</color>
+    <color name="slate">#707070</color>
+    <color name="navy">#252525</color>
+    <color name="error_red">#D32F2F</color>
+</resources>

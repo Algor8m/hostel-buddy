@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MANAGE LAUNDRY RATES"
+        android:textColor="@color/nmims_maroon"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Changes will instantly update the student price calculator and order pricing."
+        android:textColor="@color/slate"
+        android:textSize="13sp" />
+
+    <!-- Wash Rate -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="Wash &amp; Fold Rate (₹ per item)"
+        android:textColor="@color/slate"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editWashRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_input"
+        android:hint="10.00"
+        android:inputType="numberDecimal"
+        android:paddingHorizontal="12dp" />
+
+    <!-- Ironing Rate -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Steam Ironing Rate (₹ per item)"
+        android:textColor="@color/slate"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editIronRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_input"
+        android:hint="5.00"
+        android:inputType="numberDecimal"
+        android:paddingHorizontal="12dp" />
+
+    <!-- Dry Cleaning Rate -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Dry Cleaning Rate (₹ per item)"
+        android:textColor="@color/slate"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editDryRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_input"
+        android:hint="60.00"
+        android:inputType="numberDecimal"
+        android:paddingHorizontal="12dp" />
+
+    <!-- Bedsheets Rate -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Bedsheets &amp; Linens Rate (₹ per item)"
+        android:textColor="@color/slate"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editBedsheetRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_input"
+        android:hint="25.00"
+        android:inputType="numberDecimal"
+        android:paddingHorizontal="12dp" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCancelRateEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:backgroundTint="@color/pale_rose"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/nmims_maroon" />
+
+        <Button
+            android:id="@+id/btnSaveRates"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/nmims_maroon"
+            android:text="Save Rates"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

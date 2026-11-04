@@ -1,0 +1,12 @@
+{
+  "name": "hostel-buddy-admin-provisioning",
+  "version": "1.0.0",
+  "description": "Secure Administrator Provisioning scripts for Hostel Buddy",
+  "main": "provision_admin.js",
+  "scripts": {
+    "provision": "node provision_admin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

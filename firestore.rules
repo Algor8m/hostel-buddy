@@ -1,0 +1,438 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId} (matching Firebase Auth UID)
+    // Fields:
+    //   - uid: string (required, must match userId, immutable)
+    //   - email: string (required, email format)
+    //   - fullName: string (required, min 1, max 100)
+    //   - role: string (required, 'student' | 'mess_admin' | 'laundry_admin' | 'food_truck_admin', protected)
+    //   - rollNumber: string (optional)
+    //   - roomNumber: string (optional)
+    //   - phone: string (optional)
+    //   - createdAt: timestamp (immutable)
+    //   - updatedAt: timestamp (optional)
+    //   - migratedFrom: string (optional)
+    //
+    // Collection: messMenu
+    // Document ID: {week}_{dayKey} (e.g. week1_monday, week2_sunday)
+    // Fields:
+    //   - week: string ('week1' | 'week2')
+    //   - day: string ('Monday' .. 'Sunday')
+    //   - dayKey: string ('monday' .. 'sunday')
+    //   - breakfast: string (optional)
+    //   - lunch: string (optional)
+    //   - snacks: string (optional)
+    //   - dinner: string (optional)
+    //   - venue: string (optional)
+    //   - specialDinner: string (optional)
+    //   - specialDinnerVenue: string (optional)
+    //   - breakfastHours: string (optional)
+    //   - lunchHours: string (optional)
+    //   - snacksHours: string (optional)
+    //   - dinnerHours: string (optional)
+    //   - updatedAt: timestamp
+    //   - updatedBy: string (admin UID)
+    //   - batchId: string
+    //
+    // Collection: messMenuMeta
+    // Document ID: activeMenu
+    // Fields:
+    //   - activeBatchId: string
+    //   - totalDaysPublished: number
+    //   - publishedAt: timestamp
+    //   - publishedBy: string
+    //
+    // Collection: foodTruckItems
+    // Document ID: {itemId}
+    // Fields:
+    //   - itemNumber: string
+    //   - name: string (required)
+    //   - price: number (required, non-negative)
+    //   - category: string ('Veg' | 'Non Veg')
+    //   - available: bool (required)
+    //   - updatedAt: timestamp
+    //
+    // Collection: foodTruckMeta
+    // Document ID: settings
+    // Fields:
+    //   - timings: string (optional)
+    //   - venue: string (optional)
+    //   - updatedAt: timestamp
+    //
+    // Collection: laundryRates
+    // Document ID: default
+    // Fields:
+    //   - wash: number
+    //   - ironing: number
+    //   - dryCleaning: number
+    //   - bedsheet: number
+    //   - updatedAt: timestamp
+    //
+    // Collection: laundryOrders
+    // Document ID: {orderId}
+    // Fields:
+    //   - orderId: string
+    //   - userId: string (required, matches creator UID)
+    //   - userEmail: string
+    //   - userName: string
+    //   - washCount: int / number
+    //   - ironCount: int / number
+    //   - dryCount: int / number
+    //   - bedsheetCount: int / number
+    //   - estimatedTotal: number
+    //   - service: string
+    //   - status: string ('Received' | 'Accepted' | 'In Progress' | 'Ready for Collection' | 'Completed' | 'Cancelled')
+    //   - studentNotes: string (optional)
+    //   - adminNotes: string (optional)
+    //   - pickupSchedule: string (optional)
+    //   - statusHistory: list (optional)
+    //   - createdAt: timestamp
+    //   - updatedAt: timestamp
+    //
+    // ===============================================================
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasUserDoc() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserRole() {
+      return hasUserDoc() && ('role' in getUserData()) ? getUserData().role : null;
+    }
+
+    // Role-verification helpers: Support Firestore profile document, Firebase Auth Custom Claims,
+    // and explicitly authorized administrator accounts. This strictly disallows public, student,
+    // or unassigned accounts from gaining admin rights while avoiding generic broad claims.
+    function isMessAdmin() {
+      return isAuthenticated() && (
+        (hasUserDoc() && (
+          ('role' in getUserData() && getUserData().role in [
+            'mess_admin', 'Mess Admin', 'menu_admin', 'Menu Admin',
+            'mess_and_campus_cravings_admin', 'Mess & Campus Cravings Admin',
+            'super_admin', 'Super Admin'
+          ]) ||
+          ('userRole' in getUserData() && getUserData().userRole in [
+            'mess_admin', 'Mess Admin', 'menu_admin', 'Menu Admin',
+            'mess_and_campus_cravings_admin', 'Mess & Campus Cravings Admin',
+            'super_admin', 'Super Admin'
+          ])
+        )) ||
+        (request.auth.token.get('role', '') in ['mess_admin', 'menu_admin', 'super_admin']) ||
+        (request.auth.token.get('mess_admin', false) == true) ||
+        (request.auth.token.email is string && request.auth.token.email in [
+          'mess.admin@hostelbuddy.com',
+          'mess@hostelbuddy.com',
+          'mess.admin@nmims.edu',
+          'mess@nmims.edu',
+          'admin@hostelbuddy.com'
+        ])
+      );
+    }
+
+    function isLaundryAdmin() {
+      return isAuthenticated() && (
+        // 1. Verified Firestore user document role
+        (hasUserDoc() && (
+          ('role' in getUserData() && getUserData().role in [
+            'laundry_admin', 'Laundry Admin', 'laundry-admin', 'laundry', 'Laundry',
+            'super_admin', 'Super Admin', 'superadmin'
+          ]) ||
+          ('userRole' in getUserData() && getUserData().userRole in [
+            'laundry_admin', 'Laundry Admin', 'laundry-admin', 'laundry', 'Laundry',
+            'super_admin', 'Super Admin', 'superadmin'
+          ])
+        )) ||
+        // 2. Verified role-specific Firebase Auth Custom Claims
+        (request.auth.token.get('role', '') in ['laundry_admin', 'super_admin']) ||
+        (request.auth.token.get('laundry_admin', false) == true) ||
+        // 3. Explicitly authorized administrator accounts
+        (request.auth.token.email is string && request.auth.token.email in [
+          'laundry.admin@hostelbuddy.com',
+          'laundry@hostelbuddy.com',
+          'laundry_admin@hostelbuddy.com',
+          'laundry.admin@nmims.edu',
+          'laundry@nmims.edu',
+          'laundry_admin@nmims.edu',
+          'admin@hostelbuddy.com'
+        ])
+      );
+    }
+
+    function isFoodTruckAdmin() {
+      return isAuthenticated() && (
+        (hasUserDoc() && (
+          ('role' in getUserData() && getUserData().role in [
+            'food_truck_admin', 'campus_cravings_admin', 'cc_admin', 'CC Admin',
+            'Food Truck Admin', 'super_admin', 'Super Admin'
+          ]) ||
+          ('userRole' in getUserData() && getUserData().userRole in [
+            'food_truck_admin', 'campus_cravings_admin', 'cc_admin', 'CC Admin',
+            'Food Truck Admin', 'super_admin', 'Super Admin'
+          ])
+        )) ||
+        (request.auth.token.get('role', '') in ['food_truck_admin', 'cc_admin', 'super_admin']) ||
+        (request.auth.token.get('food_truck_admin', false) == true) ||
+        (request.auth.token.get('cc_admin', false) == true) ||
+        (request.auth.token.email is string && request.auth.token.email in [
+          'cravings.admin@hostelbuddy.com',
+          'cravings@hostelbuddy.com',
+          'cravings.admin@nmims.edu',
+          'cravings@nmims.edu',
+          'admin@hostelbuddy.com'
+        ]) ||
+        isMessAdmin()
+      );
+    }
+
+    function isAnyAdmin() {
+      return isMessAdmin() || isLaundryAdmin() || isFoodTruckAdmin() ||
+        (hasUserDoc() && (
+          ('role' in getUserData() && getUserData().role in ['super_admin', 'Super Admin', 'superadmin']) ||
+          ('userRole' in getUserData() && getUserData().userRole in ['super_admin', 'Super Admin', 'superadmin'])
+        )) ||
+        (request.auth.token.get('role', '') in ['super_admin']) ||
+        (request.auth.token.email is string && request.auth.token.email in ['admin@hostelbuddy.com', 'admin@nmims.edu']);
+    }
+
+    function isValidRole(role) {
+      return role in ['student', 'Student', 'mess_admin', 'Mess Admin', 'laundry_admin', 'Laundry Admin', 'laundry-admin', 'food_truck_admin', 'cc_admin', 'CC Admin', 'menu_admin', 'Menu Admin', 'super_admin', 'Super Admin', 'mess_and_campus_cravings_admin', 'campus_cravings_admin'];
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidUserDoc(data, userId) {
+      return data.uid == userId &&
+             data.email is string &&
+             ((data.fullName is string && data.fullName.size() > 0) || (data.name is string && data.name.size() > 0)) &&
+             isValidRole(data.role);
+    }
+
+    function isValidMessMenuDoc(data) {
+      return data.week is string &&
+             data.day is string &&
+             data.dayKey is string;
+    }
+
+    function isValidMessMenuMetaDoc(data) {
+      return data.activeBatchId is string &&
+             data.totalDaysPublished is number &&
+             data.totalDaysPublished >= 0;
+    }
+
+    function isValidFoodTruckItem(data) {
+      return data.name is string &&
+             data.name.size() > 0 &&
+             data.price is number &&
+             data.price >= 0 &&
+             data.available is bool;
+    }
+
+    function isValidLaundryRate(data) {
+      return data.wash is number && data.wash >= 0 &&
+             data.ironing is number && data.ironing >= 0;
+    }
+
+    function isValidLaundryOrder(data) {
+      return (
+        data.get('status', '') in [
+          'Registered', 'Order Received', 'Received', 'Washing', 'Drying', 'Ironing',
+          'Ready for Collection', 'Collected', 'Accepted', 'In Progress', 'Completed', 'Cancelled',
+          'registered', 'order received', 'received', 'washing', 'drying', 'ironing',
+          'ready for collection', 'collected', 'accepted', 'in progress', 'completed', 'cancelled'
+        ]
+      ) && (
+        (('estimatedTotal' in data) && data.estimatedTotal is number && data.estimatedTotal >= 0) ||
+        (('estimatedPrice' in data) && data.estimatedPrice is number && data.estimatedPrice >= 0) ||
+        (data.get('estimatedPrice', -1) is number && data.get('estimatedPrice', -1) >= 0) ||
+        (data.get('estimatedTotal', -1) is number && data.get('estimatedTotal', -1) >= 0)
+      );
+    }
+
+    // -------------------------------------------------------------
+    // Users collection
+    // -------------------------------------------------------------
+    match /users/{userId} {
+      // User can read their own profile; admins can read profiles for verification
+      allow read: if isOwner(userId) || isAnyAdmin();
+
+      // Profile creation:
+      // 1. Regular students can self-register ONLY with role == 'student'
+      // 2. Verified admin accounts can provision their admin profile document
+      allow create: if isOwner(userId) && (
+        (request.resource.data.role == 'student' && isValidUserDoc(request.resource.data, userId)) ||
+        (isMessAdmin() && request.resource.data.role in ['mess_admin', 'mess_and_campus_cravings_admin'] && isValidUserDoc(request.resource.data, userId)) ||
+        (isLaundryAdmin() && request.resource.data.role in ['laundry_admin', 'Laundry Admin', 'laundry-admin'] && isValidUserDoc(request.resource.data, userId)) ||
+        (isFoodTruckAdmin() && request.resource.data.role == 'food_truck_admin' && isValidUserDoc(request.resource.data, userId))
+      );
+
+      // User profile update: user can update personal details, but CANNOT alter their role or UID
+      allow update: if (isOwner(userId) &&
+                        request.resource.data.role == resource.data.role &&
+                        request.resource.data.uid == resource.data.uid) ||
+                       isAnyAdmin();
+
+      // Only admins can delete user profiles
+      allow delete: if isAnyAdmin();
+
+      // User notifications subcollection
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId) || isAnyAdmin();
+        allow create, update: if isAuthenticated();
+        allow delete: if isOwner(userId) || isAnyAdmin();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Mess Menu collection & Metadata
+    // -------------------------------------------------------------
+    // Authenticated students and admins can read published menu data
+    // Only verified mess admins can create, update, or publish menus
+    match /messMenu/{dayDocId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isMessAdmin() && isValidMessMenuDoc(request.resource.data);
+      allow delete: if isMessAdmin();
+    }
+
+    match /messMenuMeta/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isMessAdmin() && isValidMessMenuMetaDoc(request.resource.data);
+      allow delete: if isMessAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // Campus Cravings (Food Truck) collection
+    // -------------------------------------------------------------
+    match /foodTruckItems/{itemId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isFoodTruckAdmin() && isValidFoodTruckItem(request.resource.data);
+      allow delete: if isFoodTruckAdmin();
+    }
+
+    match /foodTruckMeta/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isFoodTruckAdmin();
+      allow delete: if isFoodTruckAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // Laundry Rates, Prices & Price Catalog
+    // -------------------------------------------------------------
+    match /laundryRates/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isLaundryAdmin();
+      allow delete: if isLaundryAdmin();
+    }
+
+    match /laundryPrices/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isLaundryAdmin();
+      allow delete: if isLaundryAdmin();
+    }
+
+    match /laundryConfig/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isLaundryAdmin();
+      allow delete: if isLaundryAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // Laundry Requests (Student QR Submissions & Counter Verification)
+    // -------------------------------------------------------------
+    // Students can create a laundry request ONLY for their own UID,
+    // in pending status ('Awaiting Admin Confirmation').
+    // Students can read ONLY their own laundry requests.
+    // Students can cancel ONLY their own pending requests.
+    // Students CANNOT confirm requests, create official orders, or alter confirmed orders.
+    // Laundry Admin can read all pending requests, physically verify & edit counts,
+    // confirm or reject requests, and create official laundryOrders.
+    // -------------------------------------------------------------
+    match /laundryRequests/{requestId} {
+      // Student can read only their own requests; laundry admin can read all requests
+      allow read: if isAuthenticated() && (
+        resource.data.get('studentUid', '') == request.auth.uid ||
+        isLaundryAdmin()
+      );
+
+      // Student can submit pending request for their own UID
+      allow create: if isAuthenticated() &&
+        request.resource.data.get('studentUid', '') == request.auth.uid &&
+        request.resource.data.get('status', '') == 'Awaiting Admin Confirmation' &&
+        request.resource.data.get('totalClothesCount', 0) > 0 &&
+        request.resource.data.get('estimatedPrice', 0) >= 0;
+
+      // Student can cancel ONLY their own pending request (transitioning status to 'Cancelled')
+      // Laundry Admin can confirm, reject, update verified items, or update status
+      allow update: if (
+        isOwner(resource.data.get('studentUid', '')) &&
+        resource.data.get('status', '') == 'Awaiting Admin Confirmation' &&
+        request.resource.data.get('status', '') == 'Cancelled' &&
+        request.resource.data.get('studentUid', '') == resource.data.get('studentUid', '')
+      ) || isLaundryAdmin();
+
+      // Only laundry admin can delete requests
+      allow delete: if isLaundryAdmin();
+    }
+
+    // Top-level notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.get('recipientUid', '') == request.auth.uid ||
+        isAnyAdmin()
+      );
+      allow create, update: if isAuthenticated();
+      allow delete: if isAnyAdmin();
+    }
+
+    // -------------------------------------------------------------
+    // Laundry Orders
+    // -------------------------------------------------------------
+    // MANDATORY WORKFLOW REQUIREMENT:
+    // Only authorized laundry administrators can create, update, or delete orders.
+    // Students CANNOT create, modify, or delete orders.
+    // Students can read ONLY their own orders (resource.data.studentUid == request.auth.uid || resource.data.userId == request.auth.uid).
+    // -------------------------------------------------------------
+    match /laundryOrders/{orderId} {
+      // Student can view only their own orders; laundry admin can view all orders
+      allow read: if isAuthenticated() && (
+        resource.data.get('studentUid', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isLaundryAdmin()
+      );
+
+      // Only laundry admin can create orders at the counter
+      allow create: if isLaundryAdmin() && isValidLaundryOrder(request.resource.data);
+
+      // Only laundry admin can update order status, amounts, and notes
+      allow update: if isLaundryAdmin();
+
+      // Only laundry admin can delete orders
+      allow delete: if isLaundryAdmin();
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

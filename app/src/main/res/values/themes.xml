@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.HostelBuddy" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_burgundy</item>
+        <item name="colorPrimaryVariant">@color/deep_burgundy</item>
+        <item name="colorSecondary">@color/primary_burgundy</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:statusBarColor">@color/primary_burgundy</item>
+        <item name="android:navigationBarColor">@color/background_light</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+    <style name="Theme.HostelBuddy" parent="Base.Theme.HostelBuddy" />
+
+    <!-- Fullscreen / Splash Theme -->
+    <style name="Theme.HostelBuddy.Splash" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
+</resources>

@@ -23,3 +23,6 @@ google-services.json
 # Environment files
 .env
 .env.*
+
+.agents/
+.idea/
